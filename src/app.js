@@ -1,9 +1,11 @@
 var myGamePiece;
 var myObstacles = [];
+var myScore;
 
 function startGame() {
   myGameArea.start();
   myGamePiece = new component(30, 30, "red", 10, 120);
+  myScore = new component("30px", "Consolos", "black", 280, 40, "text");
 }
 
 const myGameArea = {
@@ -42,7 +44,9 @@ const myGameArea = {
   }
 }
 
-function component(width, height, color, x, y) {
+function component(width, height, color, x, y, type) {
+  this.type = type;
+
   this.width = width;
   this.height = height;
   
@@ -55,6 +59,13 @@ function component(width, height, color, x, y) {
   this.update = function() {
     ctx = myGameArea.context;
     ctx.fillStyle = color;
+    
+    if (this.type === "text") {
+      ctx.font = this.width + " " + this.height;
+      ctx.fillText(this.text, this.x, this.y);
+      return;
+    }
+
     ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 
@@ -108,7 +119,9 @@ function updateGameArea() {
   if (myGameArea.keys && myGameArea.keys[38]) {myGamePiece.speedY = -1; }
   if (myGameArea.keys && myGameArea.keys[40]) {myGamePiece.speedY = 1; }
 
-  myGameArea.frameNo += 1;
+  // We use the frameNo property to count the score:
+  myGameArea.frameNo++;
+
   if (myGameArea.frameNo == 1 || everyinterval(150)) {
       x = myGameArea.canvas.width;
       minHeight = 20;
@@ -127,6 +140,8 @@ function updateGameArea() {
       myObstacles[i].update();
   }
 
+  myScore.text = "SCORE: " + myGameArea.frameNo;
+  myScore.update();
 
   myGamePiece.newPos();
   myGamePiece.update();
