@@ -1,9 +1,9 @@
 var myGamePiece;
+var myObstacles = [];
 
 function startGame() {
   myGameArea.start();
   myGamePiece = new component(30, 30, "red", 10, 120);
-  myObstacle = new component(10, 200, "green", 300, 120);
 }
 
 const myGameArea = {
@@ -17,18 +17,16 @@ const myGameArea = {
     document.body.insertBefore(this.canvas, document.body.childNodes[0]);
     this.interval = setInterval(updateGameArea, 20);
 
+    this.frameNo = 0;
+
     // Keyboard as Controller
     window.addEventListener('keydown', (e) => {
-      // myGameArea.key = e.keyCode; // single key pressed
-
       // Multiple Keys Pressed
       myGameArea.keys = (myGameArea.keys || []);
       myGameArea.keys[e.keyCode] = true;
     });
 
     window.addEventListener('keyup', (e) => {
-      // myGameArea.key = false; // single key unpressed
-
       // Multiple Keys Unpressed
       myGameArea.keys[e.keyCode] = false;
     });
@@ -89,23 +87,20 @@ function component(width, height, color, x, y) {
 }
 
 function updateGameArea() {
-  if (myGamePiece.crashWith(myObstacle)) {
-    myGameArea.stop();
-    return;
+  var x, height, gap, minHeight, maxHeight, minGap, maxGap;
+  
+  for (i = 0; i < myObstacles.length; i += 1) {
+      if (myGamePiece.crashWith(myObstacles[i])) {
+          myGameArea.stop();
+          return;
+      } 
   }
 
   myGameArea.clear();
-  myObstacle.x--; // Moving Obstacle
 
   // keyboard handlers
   myGamePiece.speedX = 0;
   myGamePiece.speedY = 0;
-
-   // single key pressed
-  // if (myGameArea.key && myGameArea.key == 37) {myGamePiece.speedX = -1; } // left arrow
-  // if (myGameArea.key && myGameArea.key == 39) {myGamePiece.speedX = 1; }  // right arrow
-  // if (myGameArea.key && myGameArea.key == 38) {myGamePiece.speedY = -1; } // up arrow
-  // if (myGameArea.key && myGameArea.key == 40) {myGamePiece.speedY = 1; }  // down arrow
 
   // Multiple Keys Pressed
   if (myGameArea.keys && myGameArea.keys[37]) {myGamePiece.speedX = -1; }
@@ -113,10 +108,33 @@ function updateGameArea() {
   if (myGameArea.keys && myGameArea.keys[38]) {myGamePiece.speedY = -1; }
   if (myGameArea.keys && myGameArea.keys[40]) {myGamePiece.speedY = 1; }
 
-  myObstacle.update();
+  myGameArea.frameNo += 1;
+  if (myGameArea.frameNo == 1 || everyinterval(150)) {
+      x = myGameArea.canvas.width;
+      minHeight = 20;
+      maxHeight = 200;
+      height = Math.floor(Math.random()*(maxHeight-minHeight+1)+minHeight);
+      minGap = 50;
+      maxGap = 200;
+      gap = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
+      myObstacles.push(new component(10, height, "green", x, 0));
+      myObstacles.push(new component(10, x - height - gap, "green", x, height + gap));
+  }
+  
+  for (i = 0; i < myObstacles.length; i += 1) {
+      myObstacles[i].speedX = -1;
+      myObstacles[i].newPos();
+      myObstacles[i].update();
+  }
+
 
   myGamePiece.newPos();
   myGamePiece.update();
+}
+
+function everyinterval(n) {
+  if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+  return false;
 }
 
 function moveup() {
