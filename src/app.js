@@ -75,12 +75,15 @@ function component(width, height, color, x, y) {
     var othertop = otherobj.y;
     var otherbottom = otherobj.y + (otherobj.height);
     var crash = true;
+    
     if ((mybottom < othertop) ||
-    (mytop > otherbottom) ||
-    (myright < otherleft) ||
-    (myleft > otherright)) {
+        (mytop > otherbottom) ||
+        (myright < otherleft) ||
+        (myleft > otherright)) 
+    {
       crash = false;
     }
+
     return crash;
   }
 }
@@ -92,6 +95,7 @@ function updateGameArea() {
   }
 
   myGameArea.clear();
+  myObstacle.x--; // Moving Obstacle
 
   // keyboard handlers
   myGamePiece.speedX = 0;
