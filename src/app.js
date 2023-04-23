@@ -31,6 +31,13 @@ const myGameArea = {
       // Multiple Keys Unpressed
       myGameArea.keys[e.keyCode] = false;
     });
+
+    // Using The Mouse Cursor as a Controller
+    this.canvas.style.cursor = "none"; //hide the original cursor
+    window.addEventListener('mousemove', function (e) {
+      myGameArea.x = e.pageX;
+      myGameArea.y = e.pageY;
+    });
   },
 
   clear: function() {
@@ -78,6 +85,12 @@ function updateGameArea() {
   if (myGameArea.keys && myGameArea.keys[39]) {myGamePiece.speedX = 1; }
   if (myGameArea.keys && myGameArea.keys[38]) {myGamePiece.speedY = -1; }
   if (myGameArea.keys && myGameArea.keys[40]) {myGamePiece.speedY = 1; }
+
+  // Using The Mouse Cursor as a Controller
+  if (myGameArea.x && myGameArea.y) {
+    myGamePiece.x = myGameArea.x;
+    myGamePiece.y = myGameArea.y;
+  }
 
   myGamePiece.newPos();
   myGamePiece.update();
