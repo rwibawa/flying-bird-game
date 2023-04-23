@@ -1,15 +1,22 @@
 var myGamePiece;
 var myObstacles = [];
 var myScore;
+var myBackground;
 
 function startGame() {
   myGameArea.start();
-  myGamePiece = new component(30, 30, "red", 10, 120);
+  myGamePiece = new component(30, 30, "../resources/img/smiley.gif", 10, 120, "image");
+  myBackground = new component(656, 270, "../resources/img/citymarket.jpg", 0, 0, "background");
+  
+  // Moving Background to the left
+  myBackground.speedX = -1;
+
   myScore = new component("30px", "Consolos", "black", 280, 40, "text");
 }
 
 const myGameArea = {
   canvas: document.createElement("canvas"),
+  keys: {},
 
   start: function() {
     this.canvas.width = 480;
@@ -17,20 +24,19 @@ const myGameArea = {
     this.context = this.canvas.getContext("2d");
 
     document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-    this.interval = setInterval(updateGameArea, 20);
+    this.interval = setInterval(updateGameArea, 20);  // 50 Hz
 
     this.frameNo = 0;
 
     // Keyboard as Controller
     window.addEventListener('keydown', (e) => {
       // Multiple Keys Pressed
-      myGameArea.keys = (myGameArea.keys || []);
       myGameArea.keys[e.keyCode] = true;
     });
 
     window.addEventListener('keyup', (e) => {
       // Multiple Keys Unpressed
-      myGameArea.keys[e.keyCode] = false;
+      delete myGameArea.keys[e.keyCode];
     });
     
   },
@@ -46,6 +52,10 @@ const myGameArea = {
 
 function component(width, height, color, x, y, type) {
   this.type = type;
+  if (type === "image" || type === "background") {
+    this.image = new Image();
+    this.image.src = color;
+  }
 
   this.width = width;
   this.height = height;
@@ -66,12 +76,26 @@ function component(width, height, color, x, y, type) {
       return;
     }
 
+    if (this.type === "image" || this.type === "background") {
+      ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+
+      if (this.type === "background") {
+        ctx.drawImage(this.image, this.x + this.width, this.y, this.width, this.height);
+      }
+
+      return;
+    }
+
     ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 
   this.newPos = function() {
     this.x += this.speedX;
     this.y += this.speedY;
+
+    if (this.type === "background" && this.x == -this.width) {
+      this.x = 0;
+    }
   }
 
   this.crashWith = function(otherobj) {
@@ -95,6 +119,26 @@ function component(width, height, color, x, y, type) {
 
     return crash;
   }
+
+  this.clearMove = function () {
+    this.speedX = 0;
+    this.speedY = 0;
+    this.image.src = "../resources/img/smiley.gif";
+  }
+
+  this.move = function () {
+    if (Object.keys(myGameArea.keys).length == 0) {
+      return;
+    }
+
+    this.image.src = "../resources/img/angry.gif";
+
+    // Multiple Keys Pressed
+    if (myGameArea.keys[37]) { myGamePiece.speedX = -1; }
+    if (myGameArea.keys[39]) { myGamePiece.speedX = 1; }
+    if (myGameArea.keys[38]) { myGamePiece.speedY = -1; }
+    if (myGameArea.keys[40]) { myGamePiece.speedY = 1; }
+  }
 }
 
 function updateGameArea() {
@@ -108,16 +152,11 @@ function updateGameArea() {
   }
 
   myGameArea.clear();
+  myGamePiece.clearMove();
+  myGamePiece.move();
 
-  // keyboard handlers
-  myGamePiece.speedX = 0;
-  myGamePiece.speedY = 0;
-
-  // Multiple Keys Pressed
-  if (myGameArea.keys && myGameArea.keys[37]) {myGamePiece.speedX = -1; }
-  if (myGameArea.keys && myGameArea.keys[39]) {myGamePiece.speedX = 1; }
-  if (myGameArea.keys && myGameArea.keys[38]) {myGamePiece.speedY = -1; }
-  if (myGameArea.keys && myGameArea.keys[40]) {myGamePiece.speedY = 1; }
+  myBackground.newPos();    
+  myBackground.update();
 
   // We use the frameNo property to count the score:
   myGameArea.frameNo++;
@@ -134,7 +173,7 @@ function updateGameArea() {
       myObstacles.push(new component(10, x - height - gap, "green", x, height + gap));
   }
   
-  for (i = 0; i < myObstacles.length; i += 1) {
+  for (i = 0; i < myObstacles.length; i++) {
       myObstacles[i].speedX = -1;
       myObstacles[i].newPos();
       myObstacles[i].update();
@@ -148,27 +187,5 @@ function updateGameArea() {
 }
 
 function everyinterval(n) {
-  if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
-  return false;
-}
-
-function moveup() {
-  myGamePiece.speedY -= 1;
-}
-
-function movedown() {
-  myGamePiece.speedY += 1;
-}
-
-function moveleft() {
-  myGamePiece.speedX -= 1;
-}
-
-function moveright() {
-  myGamePiece.speedX += 1;
-}
-
-function stopMove() {
-  myGamePiece.speedX = 0;
-  myGamePiece.speedY = 0;
+  return (myGameArea.frameNo / n) % 1 == 0;
 }
