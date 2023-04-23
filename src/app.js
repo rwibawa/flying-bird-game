@@ -2,9 +2,10 @@ function startGame() {
   myGameArea.start();
 }
 
-const myGameArea = {
-  start: () => {
-    this.canvas = document.createElement("canvas");
+var myGameArea = {
+  canvas: document.createElement("canvas"),
+
+  start: function() {
     this.canvas.width = 480;
     this.canvas.height = 270;
     this.context = this.canvas.getContext("2d");
@@ -12,7 +13,8 @@ const myGameArea = {
     document.body.insertBefore(this.canvas, document.body.childNodes[0]);
     this.frameNo = 0;
   },
-  clear: () => {
+  
+  clear: function() {
     this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
   }
 }
