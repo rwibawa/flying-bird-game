@@ -1,10 +1,8 @@
-var redGamePiece, greenGamePiece, blueGamePiece;
+var myGamePiece;
 
 function startGame() {
   myGameArea.start();
-  redGamePiece = new component(30, 30, "red", 10, 60);
-  greenGamePiece = new component(30, 30, "green", 10, 120);
-  blueGamePiece = new component(30, 30, "blue", 10, 180);
+  myGamePiece = new component(30, 30, "red", 10, 120);
 }
 
 const myGameArea = {
@@ -16,7 +14,7 @@ const myGameArea = {
     this.context = this.canvas.getContext("2d");
 
     document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-    this.interval = setInterval(updateGameArea, 20);;
+    this.interval = setInterval(updateGameArea, 20);
   },
 
   clear: function() {
@@ -27,24 +25,48 @@ const myGameArea = {
 function component(width, height, color, x, y) {
   this.width = width;
   this.height = height;
+  
   this.x = x;
   this.y = y;
+  
+  this.speedX = 0;
+  this.speedY = 0;
+
   this.update = function() {
     ctx = myGameArea.context;
     ctx.fillStyle = color;
     ctx.fillRect(this.x, this.y, this.width, this.height);
   }
+
+  this.newPos = function() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+  }
 }
 
 function updateGameArea() {
   myGameArea.clear();
+  myGamePiece.newPos();
+  myGamePiece.update();
+}
 
-  redGamePiece.update();
-  redGamePiece.x++;
+function moveup() {
+  myGamePiece.speedY -= 1;
+}
 
-  greenGamePiece.update();
-  greenGamePiece.x += 2;
+function movedown() {
+  myGamePiece.speedY += 1;
+}
 
-  blueGamePiece.update();
-  blueGamePiece.x += 5;
+function moveleft() {
+  myGamePiece.speedX -= 1;
+}
+
+function moveright() {
+  myGamePiece.speedX += 1;
+}
+
+function stopMove() {
+  myGamePiece.speedX = 0;
+  myGamePiece.speedY = 0;
 }
