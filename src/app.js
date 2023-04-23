@@ -1,10 +1,12 @@
 var myGamePiece;
 var myObstacles = [];
 var myScore;
+var myBackground;
 
 function startGame() {
   myGameArea.start();
-  myGamePiece = new component(30, 30, "red", 10, 120, "image");
+  myGamePiece = new component(30, 30, "../resources/img/smiley.gif", 10, 120, "image");
+  myBackground = new component(656, 270, "../resources/img/citymarket.jpg", 0, 0, "image");
   myScore = new component("30px", "Consolos", "black", 280, 40, "text");
 }
 
@@ -139,6 +141,9 @@ function updateGameArea() {
   myGameArea.clear();
   myGamePiece.clearMove();
   myGamePiece.move();
+
+  myBackground.newPos();    
+  myBackground.update();
 
   // We use the frameNo property to count the score:
   myGameArea.frameNo++;
