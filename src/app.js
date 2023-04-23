@@ -1,8 +1,10 @@
-var myGamePiece;
+var redGamePiece, greenGamePiece, blueGamePiece;
 
 function startGame() {
   myGameArea.start();
-  myGamePiece = new component(30, 30, "blue", 10, 120);
+  redGamePiece = new component(30, 30, "red", 10, 60);
+  greenGamePiece = new component(30, 30, "green", 10, 120);
+  blueGamePiece = new component(30, 30, "blue", 10, 180);
 }
 
 const myGameArea = {
@@ -36,6 +38,13 @@ function component(width, height, color, x, y) {
 
 function updateGameArea() {
   myGameArea.clear();
-  // myGamePiece.x += 1; // to check if it's drawn 50 times per second
-  myGamePiece.update();
+
+  redGamePiece.update();
+  redGamePiece.x++;
+
+  greenGamePiece.update();
+  greenGamePiece.x += 2;
+
+  blueGamePiece.update();
+  blueGamePiece.x += 5;
 }
