@@ -3,6 +3,7 @@ var myGamePiece;
 function startGame() {
   myGameArea.start();
   myGamePiece = new component(30, 30, "red", 10, 120);
+  myObstacle = new component(10, 200, "green", 300, 120);
 }
 
 const myGameArea = {
@@ -31,17 +32,15 @@ const myGameArea = {
       // Multiple Keys Unpressed
       myGameArea.keys[e.keyCode] = false;
     });
-
-    // Using The Mouse Cursor as a Controller
-    this.canvas.style.cursor = "none"; //hide the original cursor
-    window.addEventListener('mousemove', function (e) {
-      myGameArea.x = e.pageX;
-      myGameArea.y = e.pageY;
-    });
+    
   },
 
   clear: function() {
     this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
+  },
+  
+  stop : function() {
+    clearInterval(this.interval);
   }
 }
 
@@ -65,9 +64,33 @@ function component(width, height, color, x, y) {
     this.x += this.speedX;
     this.y += this.speedY;
   }
+
+  this.crashWith = function(otherobj) {
+    var myleft = this.x;
+    var myright = this.x + (this.width);
+    var mytop = this.y;
+    var mybottom = this.y + (this.height);
+    var otherleft = otherobj.x;
+    var otherright = otherobj.x + (otherobj.width);
+    var othertop = otherobj.y;
+    var otherbottom = otherobj.y + (otherobj.height);
+    var crash = true;
+    if ((mybottom < othertop) ||
+    (mytop > otherbottom) ||
+    (myright < otherleft) ||
+    (myleft > otherright)) {
+      crash = false;
+    }
+    return crash;
+  }
 }
 
 function updateGameArea() {
+  if (myGamePiece.crashWith(myObstacle)) {
+    myGameArea.stop();
+    return;
+  }
+
   myGameArea.clear();
 
   // keyboard handlers
@@ -86,11 +109,7 @@ function updateGameArea() {
   if (myGameArea.keys && myGameArea.keys[38]) {myGamePiece.speedY = -1; }
   if (myGameArea.keys && myGameArea.keys[40]) {myGamePiece.speedY = 1; }
 
-  // Using The Mouse Cursor as a Controller
-  if (myGameArea.x && myGameArea.y) {
-    myGamePiece.x = myGameArea.x;
-    myGamePiece.y = myGameArea.y;
-  }
+  myObstacle.update();
 
   myGamePiece.newPos();
   myGamePiece.update();
