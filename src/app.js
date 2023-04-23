@@ -6,7 +6,11 @@ var myBackground;
 function startGame() {
   myGameArea.start();
   myGamePiece = new component(30, 30, "../resources/img/smiley.gif", 10, 120, "image");
-  myBackground = new component(656, 270, "../resources/img/citymarket.jpg", 0, 0, "image");
+  myBackground = new component(656, 270, "../resources/img/citymarket.jpg", 0, 0, "background");
+  
+  // Moving Background to the left
+  myBackground.speedX = -1;
+
   myScore = new component("30px", "Consolos", "black", 280, 40, "text");
 }
 
@@ -48,7 +52,7 @@ const myGameArea = {
 
 function component(width, height, color, x, y, type) {
   this.type = type;
-  if (type === "image") {
+  if (type === "image" || type === "background") {
     this.image = new Image();
     this.image.src = color;
   }
@@ -72,8 +76,13 @@ function component(width, height, color, x, y, type) {
       return;
     }
 
-    if (this.type === "image") {
+    if (this.type === "image" || this.type === "background") {
       ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+
+      if (this.type === "background") {
+        ctx.drawImage(this.image, this.x + this.width, this.y, this.width, this.height);
+      }
+
       return;
     }
 
@@ -83,6 +92,10 @@ function component(width, height, color, x, y, type) {
   this.newPos = function() {
     this.x += this.speedX;
     this.y += this.speedY;
+
+    if (this.type === "background" && this.x == -this.width) {
+      this.x = 0;
+    }
   }
 
   this.crashWith = function(otherobj) {
