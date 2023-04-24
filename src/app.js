@@ -10,7 +10,7 @@ var myMusic;
 export function startGame() {
   myGameArea.start();
 
-  myGamePiece = new component(30, 30, "../resources/img/smiley.gif", 10, 120, "image", 0.05);
+  myGamePiece = new component(30, 30, "red", 10, 120, "box", 0.05);
   myBackground = new component(656, 270, "../resources/img/citymarket.jpg", 0, 0, "background");
   
   // Moving Background to the left
@@ -180,7 +180,10 @@ function component(width, height, color, x, y, type, gravity = 0) {
   this.clearMove = function () {
     this.speedX = 0;
     this.speedY = 0;
-    this.image.src = "../resources/img/smiley.gif";
+
+    if (this.type === 'image') {
+      this.image.src = "../resources/img/smiley.gif";
+    }
   }
 
   this.move = function () {
@@ -188,7 +191,9 @@ function component(width, height, color, x, y, type, gravity = 0) {
       return;
     }
 
-    this.image.src = "../resources/img/angry.gif";
+    if (this.type === 'image') {
+      this.image.src = "../resources/img/angry.gif";
+    }
 
     // Multiple Keys Pressed
     if (myGameArea.keys[37]) { myGamePiece.speedX = -1; }
