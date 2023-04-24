@@ -1,3 +1,4 @@
+import { component } from "./lib/component.js";
 import { sound } from "./lib/sound.js";
 
 var myGamePiece;
@@ -10,13 +11,13 @@ var myMusic;
 export function startGame() {
   myGameArea.start();
 
-  myGamePiece = new component(30, 30, "red", 10, 120, "box", 0.05);
-  myBackground = new component(656, 270, "../resources/img/citymarket.jpg", 0, 0, "background");
+  myGamePiece = new component(myGameArea, myGameArea.context, 30, 30, "red", 10, 120, "box", 0.05);
+  myBackground = new component(myGameArea, myGameArea.context,  656, 270, "../resources/img/citymarket.jpg", 0, 0, "background");
   
   // Moving Background to the left
   myBackground.speedX = -1;
 
-  myScore = new component("30px", "Consolos", "black", 280, 40, "text");
+  myScore = new component(myGameArea, myGameArea.context,  "30px", "Consolos", "black", 280, 40, "text");
   mySound = new sound("../resources/audio/bounce.mp3");
   myMusic = new sound("../resources/audio/gametheme.mp3");
   myMusic.play();
@@ -58,150 +59,6 @@ const myGameArea = {
   }
 }
 
-function component(width, height, color, x, y, type, gravity = 0) {
-  this.type = type;
-  if (type === "image" || type === "background") {
-    this.image = new Image();
-    this.image.src = color;
-  }
-
-  this.width = width;
-  this.height = height;
-  
-  this.x = x;
-  this.y = y;
-  
-  this.speedX = 0;
-  this.speedY = 0;
-
-  this.initialGravity = gravity;
-  this.gravity = gravity;
-  this.gravitySpeed = 0;
-
-  this.bounce = 0.6;
-  this.angle = 0;
-
-  this.update = function() {
-    const ctx = myGameArea.context;
-    ctx.fillStyle = color;
-
-    if (this.angle > 0) {
-      ctx.save();
-      ctx.translate(this.x, this.y);
-      ctx.rotate(this.angle);
-    }
-    
-    if (this.type === "text") {
-      ctx.font = this.width + " " + this.height;
-      if (this.angle > 0) {
-        ctx.fillText(this.text, this.width / -2, this.height / -2);
-        ctx.restore();
-
-        return;
-      }
-
-      ctx.fillText(this.text, this.x, this.y);
-
-      return;
-    }
-
-    if (this.type === "image" || this.type === "background") {
-
-      if (this.angle > 0) {
-        ctx.drawImage(this.image, this.width / -2, this.height / -2, this.width, this.height);
-        ctx.restore();
-
-        return;
-      }
-
-      ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-
-      if (this.type === "background") {
-        ctx.drawImage(this.image, this.x + this.width, this.y, this.width, this.height);
-      }
-
-      return;
-    }
-
-    if (this.angle > 0) {
-      ctx.fillRect(this.width / -2, this.height / -2, this.width, this.height);
-      ctx.restore();
-
-      return;
-    }
-
-    ctx.fillRect(this.x, this.y, this.width, this.height);
-  }
-
-  this.newPos = function() {
-    this.gravitySpeed += this.gravity;
-    this.x += this.speedX;
-    this.y += this.speedY + this.gravitySpeed;
-
-    if (this.type === "background" && this.x == -this.width) {
-      this.x = 0;
-    }
-    
-    if (this.gravity > 0) {
-      this.hitBottom();
-    }
-  }
-
-  this.hitBottom = function() {
-    var rockbottom = myGameArea.canvas.height - this.height;
-    if (this.y > rockbottom) {
-      this.y = rockbottom;
-      this.gravitySpeed = -(this.gravitySpeed * this.bounce);
-    }
-  }
-
-  this.crashWith = function(otherobj) {
-    var myleft = this.x;
-    var myright = this.x + (this.width);
-    var mytop = this.y;
-    var mybottom = this.y + (this.height);
-    var otherleft = otherobj.x;
-    var otherright = otherobj.x + (otherobj.width);
-    var othertop = otherobj.y;
-    var otherbottom = otherobj.y + (otherobj.height);
-    var crash = true;
-    
-    if ((mybottom < othertop) ||
-        (mytop > otherbottom) ||
-        (myright < otherleft) ||
-        (myleft > otherright)) 
-    {
-      crash = false;
-    }
-
-    return crash;
-  }
-
-  this.clearMove = function () {
-    this.speedX = 0;
-    this.speedY = 0;
-
-    if (this.type === 'image') {
-      this.image.src = "../resources/img/smiley.gif";
-    }
-  }
-
-  this.move = function () {
-    if (Object.keys(myGameArea.keys).length == 0) {
-      return;
-    }
-
-    if (this.type === 'image') {
-      this.image.src = "../resources/img/angry.gif";
-    }
-
-    // Multiple Keys Pressed
-    if (myGameArea.keys[37]) { myGamePiece.speedX = -1; }
-    if (myGameArea.keys[39]) { myGamePiece.speedX = 1; }
-    if (myGameArea.keys[38]) { myGamePiece.speedY = -1; }
-    if (myGameArea.keys[40]) { myGamePiece.speedY = 1; }
-  }
-}
 
 function updateGameArea() {
   var x, height, gap, minHeight, maxHeight, minGap, maxGap;
@@ -235,8 +92,8 @@ function updateGameArea() {
       minGap = 50;
       maxGap = 200;
       gap = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
-      myObstacles.push(new component(10, height, "green", x, 0));
-      myObstacles.push(new component(10, x - height - gap, "green", x, height + gap));
+      myObstacles.push(new component(myGameArea, myGameArea.context, 10, height, "green", x, 0));
+      myObstacles.push(new component(myGameArea, myGameArea.context, 10, x - height - gap, "green", x, height + gap));
   }
   
   for (let i = 0; i < myObstacles.length; i++) {
