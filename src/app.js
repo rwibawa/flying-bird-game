@@ -22,9 +22,6 @@ export function startGame() {
   myMusic.play();
 }
 
-// Attach an event, and call startGame when the document is done loading.
-// document.addEventListener("DOMContentLoaded", startGame);
-
 const myGameArea = {
   canvas: document.createElement("canvas"),
   keys: {},
@@ -81,6 +78,8 @@ function component(width, height, color, x, y, type, gravity = 0) {
   this.gravity = gravity;
   this.gravitySpeed = 0;
 
+  this.bounce = 0.6;
+
   this.update = function() {
     const ctx = myGameArea.context;
     ctx.fillStyle = color;
@@ -122,8 +121,7 @@ function component(width, height, color, x, y, type, gravity = 0) {
     var rockbottom = myGameArea.canvas.height - this.height;
     if (this.y > rockbottom) {
       this.y = rockbottom;
-      this.gravitySpeed = 0;
-      this.gravity = 0;
+      this.gravitySpeed = -(this.gravitySpeed * this.bounce);
     }
   }
 
