@@ -5,6 +5,7 @@ var myObstacles = [];
 var myScore;
 var myBackground;
 var mySound;
+var myMusic;
 
 function startGame() {
   myGameArea.start();
@@ -17,6 +18,8 @@ function startGame() {
 
   myScore = new component("30px", "Consolos", "black", 280, 40, "text");
   mySound = new sound("../resources/audio/bounce.mp3");
+  myMusic = new sound("../resources/audio/gametheme.mp3");
+  myMusic.play();
 }
 
 // Attach an event, and call startGame when the document is done loading.
