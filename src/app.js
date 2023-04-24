@@ -7,10 +7,10 @@ var myBackground;
 var mySound;
 var myMusic;
 
-function startGame() {
+export function startGame() {
   myGameArea.start();
 
-  myGamePiece = new component(30, 30, "../resources/img/smiley.gif", 10, 120, "image");
+  myGamePiece = new component(30, 30, "../resources/img/smiley.gif", 10, 120, "image", 0.05);
   myBackground = new component(656, 270, "../resources/img/citymarket.jpg", 0, 0, "background");
   
   // Moving Background to the left
@@ -23,7 +23,7 @@ function startGame() {
 }
 
 // Attach an event, and call startGame when the document is done loading.
-document.addEventListener("DOMContentLoaded", startGame);
+// document.addEventListener("DOMContentLoaded", startGame);
 
 const myGameArea = {
   canvas: document.createElement("canvas"),
@@ -61,7 +61,7 @@ const myGameArea = {
   }
 }
 
-function component(width, height, color, x, y, type) {
+function component(width, height, color, x, y, type, gravity = 0) {
   this.type = type;
   if (type === "image" || type === "background") {
     this.image = new Image();
@@ -76,6 +76,10 @@ function component(width, height, color, x, y, type) {
   
   this.speedX = 0;
   this.speedY = 0;
+
+  this.initialGravity = gravity;
+  this.gravity = gravity;
+  this.gravitySpeed = 0;
 
   this.update = function() {
     const ctx = myGameArea.context;
@@ -101,11 +105,25 @@ function component(width, height, color, x, y, type) {
   }
 
   this.newPos = function() {
+    this.gravitySpeed += this.gravity;
     this.x += this.speedX;
-    this.y += this.speedY;
+    this.y += this.speedY + this.gravitySpeed;
 
     if (this.type === "background" && this.x == -this.width) {
       this.x = 0;
+    }
+    
+    if (this.gravity > 0) {
+      this.hitBottom();
+    }
+  }
+
+  this.hitBottom = function() {
+    var rockbottom = myGameArea.canvas.height - this.height;
+    if (this.y > rockbottom) {
+      this.y = rockbottom;
+      this.gravitySpeed = 0;
+      this.gravity = 0;
     }
   }
 
@@ -200,4 +218,8 @@ function updateGameArea() {
 
 function everyinterval(n) {
   return (myGameArea.frameNo / n) % 1 == 0;
+}
+
+export function accelerate(n) {
+  myGamePiece.gravity = n * myGamePiece.initialGravity;
 }

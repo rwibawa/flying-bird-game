@@ -7,16 +7,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Flying Bird</title>
   <link rel="stylesheet" href="src/style.css">
-  <script type="module" src="src/app.js"></script>
+  <script type="text/javascript">
+    const app = {};
+  </script>
+  <script type="module" >
+    import { startGame, accelerate } from "./src/app.js";
+
+    app.startGame = startGame,
+    app.accelerate = accelerate
+  </script>
 </head>
 
-<body>
+<body onLoad="app.startGame()">
   <!-- 
     <button onmousedown="moveup()" onmouseup="stopMove()" ontouchstart="moveup()">UP</button>
     <button onmousedown="movedown()" onmouseup="stopMove()" ontouchstart="movedown()">DOWN</button>
     <button onmousedown="moveleft()" onmouseup="stopMove()" ontouchstart="moveleft()">LEFT</button>
     <button onmousedown="moveright()" onmouseup="stopMove()" ontouchstart="moveright()">RIGHT</button> 
   -->
+  <button onmousedown="app.accelerate(-2)" onmouseup="app.accelerate(1)">ACCELERATE</button>
 </body>
 
 </html>
