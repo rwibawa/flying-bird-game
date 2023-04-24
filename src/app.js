@@ -1,10 +1,14 @@
+import { sound } from "./lib/sound.js";
+
 var myGamePiece;
 var myObstacles = [];
 var myScore;
 var myBackground;
+var mySound;
 
 function startGame() {
   myGameArea.start();
+
   myGamePiece = new component(30, 30, "../resources/img/smiley.gif", 10, 120, "image");
   myBackground = new component(656, 270, "../resources/img/citymarket.jpg", 0, 0, "background");
   
@@ -12,7 +16,11 @@ function startGame() {
   myBackground.speedX = -1;
 
   myScore = new component("30px", "Consolos", "black", 280, 40, "text");
+  mySound = new sound("../resources/audio/bounce.mp3");
 }
+
+// Attach an event, and call startGame when the document is done loading.
+document.addEventListener("DOMContentLoaded", startGame);
 
 const myGameArea = {
   canvas: document.createElement("canvas"),
@@ -67,7 +75,7 @@ function component(width, height, color, x, y, type) {
   this.speedY = 0;
 
   this.update = function() {
-    ctx = myGameArea.context;
+    const ctx = myGameArea.context;
     ctx.fillStyle = color;
     
     if (this.type === "text") {
@@ -144,8 +152,9 @@ function component(width, height, color, x, y, type) {
 function updateGameArea() {
   var x, height, gap, minHeight, maxHeight, minGap, maxGap;
   
-  for (i = 0; i < myObstacles.length; i += 1) {
+  for (let i = 0; i < myObstacles.length; i += 1) {
       if (myGamePiece.crashWith(myObstacles[i])) {
+          mySound.play();
           myGameArea.stop();
           return;
       } 
@@ -173,7 +182,7 @@ function updateGameArea() {
       myObstacles.push(new component(10, x - height - gap, "green", x, height + gap));
   }
   
-  for (i = 0; i < myObstacles.length; i++) {
+  for (let i = 0; i < myObstacles.length; i++) {
       myObstacles[i].speedX = -1;
       myObstacles[i].newPos();
       myObstacles[i].update();
