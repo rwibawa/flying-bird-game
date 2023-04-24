@@ -11,7 +11,7 @@ var myMusic;
 export function startGame() {
   myGameArea.start();
 
-  myGamePiece = new component(myGameArea, myGameArea.context, 30, 30, "red", 10, 120, "box", 0.05);
+  myGamePiece = new component(myGameArea, myGameArea.context, 30, 30, "../resources/img/smiley.gif", 10, 120, "image", 0.05);
   myBackground = new component(myGameArea, myGameArea.context,  656, 270, "../resources/img/citymarket.jpg", 0, 0, "background");
   
   // Moving Background to the left
