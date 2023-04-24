@@ -79,23 +79,53 @@ function component(width, height, color, x, y, type, gravity = 0) {
   this.gravitySpeed = 0;
 
   this.bounce = 0.6;
+  this.angle = 0;
 
   this.update = function() {
     const ctx = myGameArea.context;
     ctx.fillStyle = color;
+
+    if (this.angle > 0) {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle);
+    }
     
     if (this.type === "text") {
       ctx.font = this.width + " " + this.height;
+      if (this.angle > 0) {
+        ctx.fillText(this.text, this.width / -2, this.height / -2);
+        ctx.restore();
+
+        return;
+      }
+
       ctx.fillText(this.text, this.x, this.y);
+
       return;
     }
 
     if (this.type === "image" || this.type === "background") {
+
+      if (this.angle > 0) {
+        ctx.drawImage(this.image, this.width / -2, this.height / -2, this.width, this.height);
+        ctx.restore();
+
+        return;
+      }
+
       ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
 
       if (this.type === "background") {
         ctx.drawImage(this.image, this.x + this.width, this.y, this.width, this.height);
       }
+
+      return;
+    }
+
+    if (this.angle > 0) {
+      ctx.fillRect(this.width / -2, this.height / -2, this.width, this.height);
+      ctx.restore();
 
       return;
     }
@@ -185,6 +215,9 @@ function updateGameArea() {
 
   myBackground.newPos();    
   myBackground.update();
+
+  // rotate the Game Piece
+  myGamePiece.angle += 1 * Math.PI / 180;
 
   // We use the frameNo property to count the score:
   myGameArea.frameNo++;
